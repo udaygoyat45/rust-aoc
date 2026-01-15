@@ -1,10 +1,7 @@
 use std::fs;
 use std::path::PathBuf;
 
-enum Direction {
-    Left,
-    Right
-}
+enum Direction { Left, Right }
 
 struct Instruction {
     direction: Direction,
@@ -26,12 +23,12 @@ impl Instruction {
     }
 }
 
-pub fn adjust_dial(dial: i64) -> i64 {
-    let mut adjusted = dial;
-    while adjusted < 0 {
-        adjusted += 100;
+fn adjust_dial(dial: &mut i64, instruction: &Instruction) {
+    let distance = instruction.distance;
+    match instruction.direction {
+        Direction::Left => *dial = (*dial - distance).rem_euclid(100),
+        Direction::Right => *dial = (*dial + distance).rem_euclid(100),
     }
-    adjusted % 100
 }
 
 pub fn main(input_path: PathBuf) {
@@ -39,17 +36,38 @@ pub fn main(input_path: PathBuf) {
     let content_opt: Option<Vec<Instruction>> = content.split('\n').map(|line| Instruction::create(line)).collect();
     let contents = content_opt.expect("Problem parsing {input_path}");
 
-    let mut dial: i64 = 50;
-    let mut counter = 0;
-    for Instruction {direction, distance} in contents {
-        match direction {
-            Direction::Left => dial -= distance,
-            Direction::Right => dial += distance
-        } 
-        dial = adjust_dial(dial);
-        if dial == 0 {
-            counter += 1;
+    let mut dial_part1: i64 = 50;
+    let mut part1_counter: i64 = 0;
+
+    for instruction in &contents {
+        adjust_dial(&mut dial_part1, instruction);
+        if dial_part1 == 0 {
+            part1_counter += 1;
         }
     }
-    println!("Answer: {counter}")
+    println!("Part One Answer: {part1_counter}");
+
+    let mut dial_part2: i64 = 50;
+    let mut part2_counter: i64 = 0;
+    for instruction in contents {
+        let distance = instruction.distance;
+        part2_counter += distance / 100;
+        let remaining_dist = distance % 100;
+
+        match instruction.direction {
+            Direction::Left => {
+                if dial_part2 > 0 && remaining_dist >= dial_part2 {
+                    part2_counter += 1;
+                }
+            }
+            Direction::Right => {
+                if dial_part2 + remaining_dist >= 100 {
+                    part2_counter += 1;
+                }
+            }
+        }
+        adjust_dial(&mut dial_part2, &instruction);
+    }
+
+    println!("Part Two Answer: {part2_counter}")
 }

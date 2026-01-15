@@ -1,4 +1,3 @@
-use core::num;
 use std::cmp::max;
 use std::path::PathBuf;
 use std::fs;
@@ -97,7 +96,6 @@ merged_intervals_len: {merged_intervals_len}");
                 ans += number;
             }
             if is_invalid_2(number) {
-                println!("{number}");
                 ans_2 += number;
             }
         } 
@@ -105,6 +103,4 @@ merged_intervals_len: {merged_intervals_len}");
 
     println!("First Rule: {ans}");
     println!("Second Rule: {ans_2}")
-
-
 }
