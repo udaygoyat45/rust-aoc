@@ -1,11 +1,14 @@
 use std::fs;
 use std::path::PathBuf;
 
-enum Direction { Left, Right }
+enum Direction {
+    Left,
+    Right,
+}
 
 struct Instruction {
     direction: Direction,
-    distance: i64
+    distance: i64,
 }
 
 impl Instruction {
@@ -15,10 +18,13 @@ impl Instruction {
         let direction = match first_char {
             'L' => Direction::Left,
             'R' => Direction::Right,
-            _ => return None
+            _ => return None,
         };
         let distance = chars.as_str().parse::<i64>().ok()?;
-        let instruction = Instruction {direction, distance};
+        let instruction = Instruction {
+            direction,
+            distance,
+        };
         Some(instruction)
     }
 }
@@ -33,7 +39,10 @@ fn adjust_dial(dial: &mut i64, instruction: &Instruction) {
 
 pub fn main(input_path: PathBuf) {
     let content = fs::read_to_string(input_path).expect("Unable to open {input_path}");
-    let content_opt: Option<Vec<Instruction>> = content.split('\n').map(|line| Instruction::create(line)).collect();
+    let content_opt: Option<Vec<Instruction>> = content
+        .split('\n')
+        .map(|line| Instruction::create(line))
+        .collect();
     let contents = content_opt.expect("Problem parsing {input_path}");
 
     let mut dial_part1: i64 = 50;

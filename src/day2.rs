@@ -1,19 +1,19 @@
 use std::cmp::max;
-use std::path::PathBuf;
 use std::fs;
+use std::path::PathBuf;
 
 #[derive(PartialEq, PartialOrd, Eq)]
 struct Interval {
     left: u64,
-    right: u64
+    right: u64,
 }
 
 impl Interval {
     fn parse(raw_str: &str) -> Option<Interval> {
-        let mut split = raw_str.split('-'); 
+        let mut split = raw_str.split('-');
         let left = split.next()?.parse::<u64>().ok()?;
         let right = split.next()?.parse::<u64>().ok()?;
-        Some(Interval {left, right})
+        Some(Interval { left, right })
     }
 }
 
@@ -36,7 +36,6 @@ fn merge_interval(intervals: &Vec<Interval>) -> Vec<Interval> {
         }
         merged_intervals.push(Interval { left, right });
         idx = jdx + 1;
-
     }
     merged_intervals
 }
@@ -45,9 +44,9 @@ fn is_invalid(num: u64) -> bool {
     let num_str = num.to_string();
     let len = num_str.len();
     if num_str.len() % 2 == 1 {
-        return false
+        return false;
     }
-    num_str[..len/2] == num_str[len/2..]
+    num_str[..len / 2] == num_str[len / 2..]
 }
 
 fn is_invalid_2(num: u64) -> bool {
@@ -55,18 +54,18 @@ fn is_invalid_2(num: u64) -> bool {
     let len = num_str.len();
     for step in 1..len {
         if len % step != 0 {
-            continue
+            continue;
         }
         let first = &num_str[..step];
         let mut unbroken = true;
         for i in (0..len).step_by(step) {
-            if &num_str[i..i+step] != first {
+            if &num_str[i..i + step] != first {
                 unbroken = false;
                 break;
             }
         }
         if unbroken {
-            return true
+            return true;
         }
     }
 
@@ -75,22 +74,27 @@ fn is_invalid_2(num: u64) -> bool {
 
 pub fn main(input_path: PathBuf) {
     let content = fs::read_to_string(input_path).expect("Unable to open {input_path}");
-    let content_opt: Option<Vec<Interval>> = content.split(',').map(|line| Interval::parse(line)).collect();
+    let content_opt: Option<Vec<Interval>> = content
+        .split(',')
+        .map(|line| Interval::parse(line))
+        .collect();
     let mut intervals = content_opt.expect("Unable to open {input_path}");
     intervals.sort();
     let merged_intervals = merge_interval(&intervals);
 
     let intervals_len = intervals.len();
     let merged_intervals_len = merged_intervals.len();
-    println!("I wanted to make sure the ranges didn't have any overlap, 
+    println!(
+        "I wanted to make sure the ranges didn't have any overlap, 
 so ran a simple interval merging algorithm
 
 intervals length: {intervals_len}
-merged_intervals_len: {merged_intervals_len}");
+merged_intervals_len: {merged_intervals_len}"
+    );
 
     let mut ans = 0;
     let mut ans_2 = 0;
-    for Interval {left, right} in merged_intervals {
+    for Interval { left, right } in merged_intervals {
         for number in left..right + 1 {
             if is_invalid(number) {
                 ans += number;
@@ -98,7 +102,7 @@ merged_intervals_len: {merged_intervals_len}");
             if is_invalid_2(number) {
                 ans_2 += number;
             }
-        } 
+        }
     }
 
     println!("First Rule: {ans}");
